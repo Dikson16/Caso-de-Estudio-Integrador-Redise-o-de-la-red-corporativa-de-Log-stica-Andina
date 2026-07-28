@@ -1,4 +1,4 @@
-# Tabla de Direccionamiento — VLSM
+# Tabla de Direccionamiento — VLSM wg
 
 ## 1. Criterio de asignación
 
