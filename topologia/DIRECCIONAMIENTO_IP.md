@@ -34,28 +34,6 @@ Este documento consolida el plan de direccionamiento IP para las sedes y segment
 4. Documentar cambios relevantes mediante commits descriptivos.
 5. Validar disponibilidad de IP antes de asignar nuevos equipos o servicios.
 
-## Ejemplo de commits sugeridos
-
-```bash
-git add README.md
-git commit -m "Documenta plan de direccionamiento IP por sede y segmento"
-git push origin main
-```
-
-## Estructura recomendada del repositorio
-
-```text
-redireccionamiento-ip/
-├── README.md
-├── docs/
-│   └── criterios-diseno.md
-├── inventario/
-│   └── subredes.csv
-└── diagramas/
-    └── topologia-red.png
-```
-
 ## Autor
 
-Área de Tecnología e Información  
-CENTAK ANDINA
+Área de Tecnología e Información
