@@ -1,4 +1,4 @@
-# Tabla de Decisiones de Diseño (TDD)
+# Tabla de Decisiones de Diseño (TDD) wg
 
 > Regla de oro: cualquier integrante del equipo debe poder defender cualquier fila de esta tabla
 > en la sustentación individual. Si no pueden explicar el *por qué* sin leerlo, no está listo.
