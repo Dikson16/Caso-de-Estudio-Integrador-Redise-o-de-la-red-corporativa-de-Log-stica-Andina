@@ -1,19 +1,41 @@
 Building configuration...
 
-Current configuration : 2945 bytes
+Current configuration : 7967 bytes
 !
 version 16.3.2
 no service timestamps log datetime msec
 no service timestamps debug datetime msec
-no service password-encryption
+service password-encryption
 !
 hostname SW-BOG-L3
 !
+login block-for 120 attempts 3 within 60
 !
 no profinet
+enable secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
 !
 !
+ip dhcp excluded-address 172.16.1.1 172.16.1.10
+ip dhcp excluded-address 172.16.2.129 172.16.2.138
+ip dhcp excluded-address 172.16.3.129 172.16.3.135
+ip dhcp excluded-address 172.16.0.1 172.16.0.10
 !
+ip dhcp pool ADMIN_FINANZAS
+ network 172.16.1.0 255.255.255.0
+ default-router 172.16.1.1
+ dns-server 8.8.8.8
+ip dhcp pool OPERACIONES
+ network 172.16.2.128 255.255.255.128
+ default-router 172.16.2.129
+ dns-server 8.8.8.8
+ip dhcp pool TI
+ network 172.16.3.128 255.255.255.192
+ default-router 172.16.3.129
+ dns-server 8.8.8.8
+ip dhcp pool WIFI_INVITADOS
+ network 172.16.0.0 255.255.255.0
+ default-router 172.16.0.1
+ dns-server 8.8.8.8
 !
 !
 !
@@ -24,6 +46,7 @@ no ipv6 cef
 !
 !
 !
+username ti_admin privilege 15 secret 5 $1$mERr$DGXTIR05RY46aoNvoFXq10
 !
 !
 !
@@ -33,7 +56,12 @@ no ipv6 cef
 !
 !
 !
+!
+ip ssh version 2
+ip ssh authentication-retries 2
+ip ssh time-out 60
 no ip domain-lookup
+ip domain-name logisticaandina.com.co
 !
 !
 spanning-tree mode pvst
@@ -47,72 +75,166 @@ interface Loopback0
  ip address 172.16.255.4 255.255.255.255
 !
 interface GigabitEthernet1/0/1
- switchport trunk allowed vlan 10,30,50
+ switchport trunk native vlan 998
+ switchport trunk allowed vlan 10,20,30,50
  switchport mode trunk
+ switchport nonegotiate
 !
 interface GigabitEthernet1/0/2
- switchport trunk allowed vlan 20,50
+ switchport trunk native vlan 998
+ switchport trunk allowed vlan 10,20,30,50
  switchport mode trunk
+ switchport nonegotiate
 !
 interface GigabitEthernet1/0/3
+ description Acceso AP-BOG-GUEST (Wi-Fi invitados)
  switchport access vlan 40
  switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
 !
 interface GigabitEthernet1/0/4
- switchport access vlan 60
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
  switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/5
+ description Acceso Server-BOG-MGMT (NTP/Syslog/TFTP)
  switchport access vlan 50
  switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
 !
 interface GigabitEthernet1/0/6
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/7
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/8
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/9
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/10
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/11
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/12
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/13
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/14
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/15
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/16
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/17
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/18
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/19
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/20
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/21
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/22
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/23
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/0/24
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet1/1/1
- no switchport
- ip address 172.16.4.42 255.255.255.252
- ip ospf cost 10
-!
-interface GigabitEthernet1/1/2
+ description Enlace de respaldo a R-BOG-CORE
  no switchport
  ip address 172.16.4.46 255.255.255.252
+ ip ospf authentication message-digest
+ ip ospf message-digest-key 1 md5 OspfLogAndina2026
  ip ospf cost 50
+!
+interface GigabitEthernet1/1/2
+ description Enlace primario a R-BOG-CORE
+ no switchport
+ ip address 172.16.4.42 255.255.255.252
+ ip ospf authentication message-digest
+ ip ospf message-digest-key 1 md5 OspfLogAndina2026
+ ip ospf cost 10
 !
 interface GigabitEthernet1/1/3
 !
@@ -170,19 +292,59 @@ ip classless
 ip flow-export version 9
 !
 !
+ip access-list extended sl_def_acl
+ deny tcp any any eq telnet
+ deny tcp any any eq www
+ deny tcp any any eq 22
+ permit tcp any any eq 22
+ip access-list extended WIFI-GUEST-OUT
+ remark Invitados Wi-Fi: bloquea TODO lo interno de Logistica Andina
+ remark DHCP/ARP son locales a la VLAN, no cruzan el router
+ deny ip any 172.16.0.0 0.0.255.255
+ remark Lo que no es interno cae aqui: Internet, permitido
+ permit ip any any
+ip access-list extended GESTION-IN
+ remark Solo TI administra por SSH los switches cuya IP de gestion vive aqui
+ permit tcp 172.16.3.128 0.0.0.63 any eq 22
+ remark Solo NTP/Syslog/TFTP/SNMP entran, y solo desde direcciones internas
+ remark (equipos de red) - no desde invitados ni desde Internet
+ permit udp 172.16.0.0 0.0.255.255 any eq 123
+ permit udp 172.16.0.0 0.0.255.255 any eq 514
+ permit udp 172.16.0.0 0.0.255.255 any eq tftp
+ permit udp 172.16.0.0 0.0.255.255 any eq snmp
+ remark Retorno de sesiones que la propia gestion inicia hacia otros equipos
+ permit tcp any any established
+ip access-list standard TI-ADMIN-ONLY
+ remark Solo TI administra los equipos de red
+ permit 172.16.3.128 0.0.0.63
+ deny any
 !
+banner motd ^C
+ACCESO RESTRINGIDO - Logistica Andina S.A.S.
+Este sistema es unicamente para personal autorizado de TI.
+Todo acceso no autorizado sera perseguido conforme a la ley.
+
+^C
 !
 !
 !
 !
 line con 0
+ exec-timeout 5 0
+ password 7 0822455D0A16
+ logging synchronous
+ login
 !
 line aux 0
 !
 line vty 0 4
- login
+ access-class TI-ADMIN-ONLY in
+ exec-timeout 5 0
+ login local
+ transport input ssh
 !
 !
 !
+ntp server 172.16.4.18
 !
 end

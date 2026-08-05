@@ -1,6 +1,6 @@
 Building configuration...
 
-Current configuration : 711 bytes
+Current configuration : 978 bytes
 !
 version 15.1
 no service timestamps log datetime msec
@@ -44,6 +44,10 @@ spanning-tree mode pvst
 !
 !
 !
+interface Loopback0
+ description Simulacion de host de Internet
+ ip address 4.2.2.2 255.255.255.255
+!
 interface GigabitEthernet0/0
  no ip address
  duplex auto
@@ -59,11 +63,16 @@ interface GigabitEthernet0/1
 interface GigabitEthernet0/0/0
  ip address 209.165.201.1 255.255.255.252
 !
+interface GigabitEthernet0/1/0
+ description Enlace hacia R-ISP-1 (peering entre ISP)
+ ip address 203.0.113.2 255.255.255.252
+!
 interface Vlan1
  no ip address
  shutdown
 !
 ip classless
+ip route 0.0.0.0 0.0.0.0 203.0.113.1 
 !
 ip flow-export version 9
 !

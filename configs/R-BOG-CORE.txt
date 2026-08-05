@@ -1,13 +1,13 @@
 Building configuration...
 
-Current configuration : 2204 bytes
+Current configuration : 3197 bytes
 !
 version 15.1
 no service timestamps log datetime msec
 no service timestamps debug datetime msec
 service password-encryption
 !
-hostname R-CALI-01
+hostname R-BOG-CORE
 !
 login block-for 120 attempts 3 within 60
 !
@@ -15,16 +15,11 @@ login block-for 120 attempts 3 within 60
 enable secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
 !
 !
-ip dhcp excluded-address 172.16.3.65 172.16.3.70
-!
-ip dhcp pool USUARIOS_CALI
- network 172.16.3.64 255.255.255.192
- default-router 172.16.3.65
- dns-server 8.8.8.8
 !
 !
 !
-ip cef
+!
+no ip cef
 no ipv6 cef
 !
 !
@@ -32,7 +27,7 @@ no ipv6 cef
 username ti_admin privilege 15 secret 5 $1$mERr$DGXTIR05RY46aoNvoFXq10
 !
 !
-license udi pid CISCO2911/K9 sn FTX1524ZBPA-
+license udi pid CISCO2911/K9 sn FTX15244223-
 !
 !
 !
@@ -59,23 +54,23 @@ spanning-tree mode pvst
 !
 !
 interface Loopback0
- ip address 172.16.255.3 255.255.255.255
+ description Router-ID OSPF
+ ip address 172.16.255.5 255.255.255.255
 !
 interface GigabitEthernet0/0
- ip address 172.16.4.34 255.255.255.252
+ description WAN dedicado hacia R-CALI-01 (privado, sin Internet)
+ ip address 172.16.4.33 255.255.255.252
  ip ospf authentication message-digest
  ip ospf message-digest-key 1 md5 OspfLogAndina2026
  duplex auto
  speed auto
 !
 interface GigabitEthernet0/1
- no ip address
+ description Enlace directo a Server-BOG-DMZ (three-legged)
+ ip address 172.16.4.1 255.255.255.240
+ ip access-group DMZ-IN in
  duplex auto
  speed auto
-!
-interface GigabitEthernet0/1.10
- encapsulation dot1Q 10
- ip address 172.16.3.65 255.255.255.192
 !
 interface GigabitEthernet0/2
  no ip address
@@ -83,17 +78,40 @@ interface GigabitEthernet0/2
  speed auto
  shutdown
 !
+interface GigabitEthernet0/0/0
+ description Enlace primario a SW-BOG-L3
+ ip address 172.16.4.41 255.255.255.252
+ ip ospf authentication message-digest
+ ip ospf message-digest-key 1 md5 OspfLogAndina2026
+ ip ospf cost 10
+!
+interface GigabitEthernet0/1/0
+ description Enlace de respaldo a SW-BOG-L3
+ ip address 172.16.4.45 255.255.255.252
+ ip ospf authentication message-digest
+ ip ospf message-digest-key 1 md5 OspfLogAndina2026
+ ip ospf cost 50
+!
+interface GigabitEthernet0/2/0
+ description Enlace hacia R-BOG-01
+ ip address 172.16.4.50 255.255.255.252
+ ip ospf authentication message-digest
+ ip ospf message-digest-key 1 md5 OspfLogAndina2026
+!
 interface Vlan1
  no ip address
  shutdown
 !
 router ospf 1
- router-id 172.16.255.3
+ router-id 172.16.255.5
  log-adjacency-changes
- passive-interface GigabitEthernet0/1.10
- network 172.16.255.3 0.0.0.0 area 0
- network 172.16.3.64 0.0.0.63 area 0
+ passive-interface GigabitEthernet0/1
+ network 172.16.255.5 0.0.0.0 area 0
+ network 172.16.4.48 0.0.0.3 area 0
+ network 172.16.4.40 0.0.0.3 area 0
+ network 172.16.4.44 0.0.0.3 area 0
  network 172.16.4.32 0.0.0.3 area 0
+ network 172.16.4.0 0.0.0.15 area 0
 !
 ip classless
 !
@@ -109,6 +127,13 @@ ip access-list standard TI-ADMIN-ONLY
  remark Solo TI administra los equipos de red
  permit 172.16.3.128 0.0.0.63
  deny any
+ip access-list extended DMZ-IN
+ permit tcp any 172.16.0.0 0.0.255.255 established
+ permit icmp any 172.16.0.0 0.0.255.255 echo-reply
+ permit icmp any 172.16.0.0 0.0.255.255 ttl-exceeded
+ permit icmp any 172.16.0.0 0.0.255.255 unreachable
+ deny ip any 172.16.0.0 0.0.255.255
+ permit ip any any
 !
 banner motd ^C
 ACCESO RESTRINGIDO - Logistica Andina S.A.S.

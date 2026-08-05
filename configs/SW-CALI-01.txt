@@ -1,92 +1,235 @@
 Building configuration...
 
-Current configuration : 1245 bytes
+Current configuration : 4929 bytes
 !
 version 15.0
 no service timestamps log datetime msec
 no service timestamps debug datetime msec
-no service password-encryption
+service password-encryption
 !
 hostname SW-CALI-01
 !
+enable secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
 !
 !
+!
+ip ssh version 2
+ip ssh authentication-retries 2
+ip ssh time-out 60
 no ip domain-lookup
+ip domain-name logisticaandina.com.co
+!
+username ti_admin secret 5 $1$mERr$DGXTIR05RY46aoNvoFXq10
+!
+vtp mode transparent
 !
 !
 !
 spanning-tree mode pvst
 spanning-tree extend system-id
 !
+vlan 10
+ name USUARIOS
+!
+vlan 998
+ name NATIVA_SIN_USO
+!
+vlan 999
+ name PARKING_LOT
+!
 interface FastEthernet0/1
  switchport access vlan 10
  switchport mode access
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 00E0.8FAE.331A
 !
 interface FastEthernet0/2
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/3
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/4
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/5
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/6
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/7
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/8
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/9
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/10
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/11
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/12
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/13
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/14
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/15
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/16
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/17
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/18
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/19
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/20
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/21
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/22
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/23
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface FastEthernet0/24
+ description Puerto sin uso - parking lot
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface GigabitEthernet0/1
+ description Trunk hacia R-CALI-01 (router-on-a-stick)
+ switchport trunk native vlan 998
  switchport trunk allowed vlan 10
  switchport mode trunk
+ switchport nonegotiate
 !
 interface GigabitEthernet0/2
+ description Puerto Gig no usado
+ switchport access vlan 999
+ switchport mode access
+ shutdown
 !
 interface Vlan1
  no ip address
  shutdown
 !
+interface Vlan10
+ description IP de gestion del switch
+ ip address 172.16.3.66 255.255.255.192
+!
 ip default-gateway 172.16.3.65
 !
+banner motd ^C
+ACCESO RESTRINGIDO - Logistica Andina S.A.S.
+Este sistema es unicamente para personal autorizado de TI.
+Todo acceso no autorizado sera perseguido conforme a la ley.
+^C
 !
 !
 !
+ip access-list standard TI-ADMIN-ONLY
+ remark Solo TI administra los equipos de red
+ permit 172.16.3.128 0.0.0.63
+ deny any
 line con 0
+ password 7 0822455D0A16
+ logging synchronous
+ login
+ exec-timeout 5 0
 !
 line vty 0 4
- login
+ access-class TI-ADMIN-ONLY in
+ exec-timeout 5 0
+ login local
+ transport input ssh
 line vty 5 15
  login
 !

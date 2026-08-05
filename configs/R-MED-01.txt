@@ -1,18 +1,32 @@
 Building configuration...
 
-Current configuration : 1491 bytes
+Current configuration : 3009 bytes
 !
 version 15.1
 no service timestamps log datetime msec
 no service timestamps debug datetime msec
-no service password-encryption
+service password-encryption
 !
 hostname R-MED-01
 !
+login block-for 120 attempts 3 within 60
 !
 !
+enable secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
 !
 !
+ip dhcp excluded-address 172.16.2.1 172.16.2.10
+ip dhcp excluded-address 172.16.3.1 172.16.3.7
+!
+ip dhcp pool USUARIOS_MED
+ network 172.16.2.0 255.255.255.128
+ default-router 172.16.2.1
+ dns-server 8.8.8.8
+ip dhcp pool OPERACIONES_MED
+ network 172.16.3.0 255.255.255.192
+ default-router 172.16.3.1
+ dns-server 8.8.8.8
+ domain-name wr
 !
 !
 !
@@ -20,6 +34,8 @@ no ip cef
 no ipv6 cef
 !
 !
+!
+username ti_admin privilege 15 secret 5 $1$mERr$DGXTIR05RY46aoNvoFXq10
 !
 !
 license udi pid CISCO2911/K9 sn FTX15242SNV-
@@ -34,6 +50,11 @@ license udi pid CISCO2911/K9 sn FTX15242SNV-
 !
 !
 !
+ip ssh version 2
+ip ssh authentication-retries 2
+ip ssh time-out 60
+no ip domain-lookup
+ip domain-name logisticaandina.com.co
 !
 !
 spanning-tree mode pvst
@@ -49,7 +70,7 @@ interface Loopback0
 interface Tunnel0
  ip address 172.16.4.38 255.255.255.252
  mtu 1476
- tunnel source GigabitEthernet0/1
+ tunnel source GigabitEthernet0/0/0
  tunnel destination 209.165.200.226
 !
 !
@@ -61,10 +82,12 @@ interface GigabitEthernet0/0
 interface GigabitEthernet0/0.10
  encapsulation dot1Q 10
  ip address 172.16.2.1 255.255.255.128
+ ip nat inside
 !
 interface GigabitEthernet0/0.20
  encapsulation dot1Q 20
  ip address 172.16.3.1 255.255.255.192
+ ip nat inside
 !
 interface GigabitEthernet0/1
  no ip address
@@ -80,6 +103,7 @@ interface GigabitEthernet0/2
 !
 interface GigabitEthernet0/0/0
  ip address 198.51.100.2 255.255.255.252
+ ip nat outside
 !
 interface Vlan1
  no ip address
@@ -95,23 +119,49 @@ router ospf 1
  network 172.16.3.0 0.0.0.63 area 0
  network 172.16.4.36 0.0.0.3 area 0
 !
+ip nat inside source list NAT-INSIDE-SOURCES-MED interface GigabitEthernet0/0/0 overload
 ip classless
 ip route 0.0.0.0 0.0.0.0 198.51.100.1 
 !
 ip flow-export version 9
 !
 !
+ip access-list extended sl_def_acl
+ deny tcp any any eq telnet
+ deny tcp any any eq www
+ deny tcp any any eq 22
+ permit tcp any any eq 22
+ip access-list standard TI-ADMIN-ONLY
+ remark Solo TI administra los equipos de red
+ permit 172.16.3.128 0.0.0.63
+ deny any
+ip access-list standard NAT-INSIDE-SOURCES-MED
+ remark Segmentos de Medellin autorizados a salir a Internet via PAT
+ permit 172.16.2.0 0.0.0.127
+ permit 172.16.3.0 0.0.0.63
 !
+banner motd ^C
+ACCESO RESTRINGIDO - Logistica Andina S.A.S.
+Este sistema es unicamente para personal autorizado de TI.
+Todo acceso no autorizado sera perseguido conforme a la ley.
+^C
 !
 !
 !
 !
 line con 0
+ exec-timeout 5 0
+ password 7 0822455D0A16
+ logging synchronous
+ login
 !
 line aux 0
 !
 line vty 0 4
- login
+ access-class TI-ADMIN-ONLY in
+ exec-timeout 5 0
+ login local
+ transport input ssh
 !
 !
 !
